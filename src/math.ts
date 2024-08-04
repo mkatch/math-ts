@@ -1,5 +1,202 @@
 const DEG_TO_RAD = Math.PI / 180
 
+export function sq(x: number): number {
+	return x * x
+}
+
+export type int = number & { readonly int: unique symbol }
+export function int(n: number): int {
+	if (!Number.isInteger(n)) {
+		throw new Error("not an integer")
+	}
+	return n as int
+}
+
+/** Undecorated shape of {@link Vec2} */
+export type Vec2Shape = [x: number, y: number]
+
+/** 2D cartesian vector. */
+export type Vec2 = Vec2Shape & { readonly "": unique symbol }
+export function Vec2(...data: Vec2Shape): Vec2 {
+	return data as Vec2
+}
+
+export namespace Vec2 {
+	export function uninitialized(): Vec2 {
+		return new Array<number>(2) as Vec2
+	}
+
+	export function zero(_ = uninitialized()): Vec2 {
+		_[0] = 0
+		_[1] = 0
+		return _
+	}
+
+	export function isZero(v: Vec2): boolean {
+		return v[0] === 0 && v[1] === 0
+	}
+
+	export function polar(r: number, angle: number, _ = uninitialized()): Vec2 {
+		_[0] = r * Math.cos(angle)
+		_[1] = r * Math.sin(angle)
+		return _
+	}
+
+	export function copy(v: Vec2, _: Vec2 = uninitialized()): Vec2 {
+		_[0] = v[0]
+		_[1] = v[1]
+		return _
+	}
+
+	export function set(u: Vec2, x: number, y: number): Vec2 {
+		u[0] = x
+		u[1] = y
+		return u
+	}
+
+	export function uniform(s: number, _ = uninitialized()): Vec2 {
+		_[0] = s
+		_[1] = s
+		return _
+	}
+
+	export function add(u: Vec2, v: Vec2): void {
+		u[0] += v[0]
+		u[1] += v[1]
+	}
+
+	export function sum(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] + v[0]
+		_[1] = u[1] + v[1]
+		return _
+	}
+
+	export function sub(u: Vec2, v: Vec2): void {
+		u[0] -= v[0]
+		u[1] -= v[1]
+	}
+
+	export function diff(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] - v[0]
+		_[1] = u[1] - v[1]
+		return _
+	}
+	
+	export function scale(u: Vec2, s: number): void {
+		u[0] *= s
+		u[1] *= s
+	}
+
+	export function translated(P: Vec2, u: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = P[0] + u[0]
+		_[1] = P[1] + u[1]
+		return _
+	}
+
+	export function scaled(u: Vec2, s: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0] * s
+		_[1] = u[1] * s
+		return _
+	}
+
+	export function divided(u: Vec2, s: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0] / s
+		_[1] = u[1] / s
+		return _
+	}
+
+	export function addScaled(u: Vec2, s: number, v: Vec2): void {
+		u[0] += s * v[0]
+		u[1] += s * v[1]
+	}
+
+	export function span(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = Q[0] - P[0]
+		_[1] = Q[1] - P[1]
+		return _
+	}
+
+	export function min(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = Math.min(u[0], v[0])
+		_[1] = Math.min(u[1], v[1])
+		return _
+	}
+
+	export function max(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = Math.max(u[0], v[0])
+		_[1] = Math.max(u[1], v[1])
+		return _
+	}
+
+	export function mid(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = 0.5 * P[0] + 0.5 * Q[0]
+		_[1] = 0.5 * P[1] + 0.5 * Q[1]
+		return _
+	}
+
+	export function lper(u: Vec2, _ = uninitialized()): Vec2 {
+		const x = u[0]
+		_[0] = -u[1]
+		_[1] = x
+		return _
+	}
+
+	export function floor(u: Vec2, _ = uninitialized()): IVec2 {
+		_[0] = Math.floor(u[0])
+		_[1] = Math.floor(u[1])
+		return _ as IVec2
+	}
+
+	export function dot(u: Vec2, v: Vec2): number {
+		return u[0] * v[0] + u[1] * v[1]
+	}
+
+	export function per(u: Vec2, v: Vec2): number {
+		return u[0] * v[1] - u[1] * v[0]
+	}
+
+	export function len(u: Vec2): number {
+		return Math.hypot(u[0], u[1])
+	}
+
+	export function lenSq(u: Vec2): number {
+		return u[0] * u[0] + u[1] * u[1]
+	}
+
+	export function distSq(P: Vec2, Q: Vec2): number {
+		const dx = P[0] - Q[0]
+		const dy = P[1] - Q[1]
+		return dx * dx + dy * dy
+	}
+
+	export function withLen(u: Vec2, l: number, _ = uninitialized()): Vec2 {
+		const s = l / Math.hypot(u[0], u[1])
+		_[0] = u[0] * s
+		_[1] = u[1] * s
+		return _
+	}
+
+	export function lengthLimited(u: Vec2, maxLength: number, _ = uninitialized()): Vec2 {
+		// TODO: check if maxLength is positive
+		const l = Math.hypot(u[0], u[1])
+		return l > maxLength ? scaled(u, maxLength / l, _) : copy(u, _)
+	}
+
+	export function lerp(u: Vec2, v: Vec2, t: number, _ = uninitialized()): Vec2 {
+		const s = 1 - t
+		_[0] = s * u[0] + t * v[0]
+		_[1] = s * u[1] + t * v[1]
+		return _
+	}
+
+	export function str(u: Vec2): string {
+		return `[${u[0]} ${u[1]}]`
+	}
+}
+
+export type IVec2Shape = [x: int, y: int]
+export type IVec2 = Vec2 & IVec2Shape
+
 /** Undecorated shape of {@link Vec3} */
 export type Vec3Shape = [x: number, y: number, z: number]
 
@@ -64,6 +261,41 @@ export namespace Vec3 {
 		_[0] = 0.5 * P[0] + 0.5 * Q[0]
 		_[1] = 0.5 * P[1] + 0.5 * Q[1]
 		_[2] = 0.5 * P[2] + 0.5 * Q[2]
+		return _
+	}
+}
+
+export type Mat2AShape = [
+	a00: number, a01: number, dx: number,
+	a10: number, a11: number, dy: number,
+]
+
+export type Mat2A = Mat2AShape & { readonly "": unique symbol }
+export function Mat2A(data: Mat2AShape): Mat2A {
+	return data as Mat2A
+}
+
+export namespace Mat2A {
+	export function uninitialized(): Mat2A {
+		return new Array<number>(6) as Mat2A
+	}
+
+	export function eye(_ = uninitialized()): Mat2A {
+		_[0] = 1, _[1] = 0, _[2] = 0
+		_[3] = 0, _[4] = 1, _[5] = 0
+		return _
+	}
+
+	export function fromDOMMatrix(M: DOMMatrix, _ = uninitialized()): Mat2A {
+		_[0] = M.a, _[1] = M.b, _[2] = M.e
+		_[3] = M.c, _[4] = M.d, _[5] = M.f
+		return _
+	}
+
+	export function transformPoint(M: Mat2A, P: Vec2, _ = Vec2.uninitialized()): Vec2 {
+		const x = P[0], y = P[1]
+		_[0] = M[0] * x + M[1] * y + M[2]
+		_[1] = M[3] * x + M[4] * y + M[5]
 		return _
 	}
 }
@@ -345,6 +577,133 @@ export namespace Mat4 {
 		const c1 = (c0 * height) / width
 
 		return Mat4([c1, 0, 0, 0, 0, c0, 0, 0, 0, 0, -(near + far) / depth, (-2 * near * far) / depth, 0, 0, -1, 0])
+	}
+
+	export function fromDOMMatrix(m: DOMMatrix): Mat4 {
+		return Mat4([
+			m.m11, m.m12, m.m13, m.m14,
+			m.m21, m.m22, m.m23, m.m24,
+			m.m31, m.m32, m.m33, m.m34,
+			m.m41, m.m42, m.m43, m.m44,
+		])
+	}
+
+	export function transformPoint(M: Mat4, P: Vec3): Vec3 {
+		const x = P[0], y = P[1], z = P[2]
+		const w = M[12] * x + M[13] * y + M[14] * z + M[15]
+		return Vec3(
+			(M[0] * x + M[1] * y + M[2] * z + M[3]) / w,
+			(M[4] * x + M[5] * y + M[6] * z + M[7]) / w,
+			(M[8] * x + M[9] * y + M[10] * z + M[11]) / w,
+		)
+	}
+}
+
+export type Box2 = [P0: Vec2, P1: Vec2]
+
+export namespace Box2 {
+	export function uninitialized(): Box2 {
+		return [Vec2.uninitialized(), Vec2.uninitialized()]
+	}
+
+	export function empty(_ = uninitialized()): Box2 {
+		Vec2.uniform(Infinity, _[0])
+		Vec2.uniform(-Infinity, _[1])
+		return _
+	}
+
+	export function copy(B: Box2, _: Box2 = empty()): Box2 {
+		Vec2.copy(B[0], _[0])
+		Vec2.copy(B[1], _[1])
+		return _
+	}
+
+	export function center(B: Box2, _ = Vec2.uninitialized()): Vec2 {
+		return Vec2.mid(B[0], B[1], _)
+	}
+
+	export function size(B: Box2, _ = Vec2.uninitialized()): Vec2 {
+		return Vec2.span(B[0], B[1], _)
+	}
+
+	export function expand(B: Box2, P: Vec2): void {
+		Vec2.min(B[0], P, B[0])
+		Vec2.max(B[1], P, B[1])
+	}
+
+	export function expandAll(B: Box2, Ps: Iterable<Vec2>): void {
+		const [P0, P1] = B
+		for (const P of Ps) {
+			Vec2.min(P0, P, P0)
+			Vec2.max(P1, P, P1)
+		}
+	}
+
+	export function expandByBox(B: Box2, C: Box2): void {
+		Vec2.min(B[0], C[0], B[0])
+		Vec2.max(B[1], C[1], B[1])
+	}
+
+	export function expandByBoxes(B: Box2, Cs: Iterable<Box2>): void {
+		for (const C of Cs) {
+			expandByBox(B, C)
+		}
+	}
+
+	export function scale(B: Box2, s: number): void {
+		Vec2.scaled(B[0], s, B[0])
+		Vec2.scaled(B[1], s, B[1])
+	}
+
+	export function floor(B: Box2): void {
+		Vec2.floor(B[0], B[0])
+		Vec2.floor(B[1], B[1])
+	}
+
+	export function fromPoints(Ps: Iterable<Vec2>, _ = uninitialized()): Box2 {
+		empty(_)
+		expandAll(_, Ps)
+		return _
+	}
+
+	export function wrapping(Bs: Iterable<Box2>, _ = uninitialized()): Box2 {
+		empty(_)
+		for (const B of Bs) {
+			expandByBox(_, B)
+		}
+		return _
+	}
+
+	export function fromCenterRadius(P: Vec2, r: number, _ = uninitialized()): Box2 {
+		const x = P[0], y = P[1]
+		Vec2.set(_[0], x - r, y - r)
+		Vec2.set(_[1], x + r, y + r)
+		return _
+	}
+
+	export function span(B: Box2, _ = Vec2.zero()): Vec2 {
+		return Vec2.span(B[0], B[1], _)
+	}
+
+	export function containsInEx(B: Box2, P: Vec2): boolean {
+		return B[0][0] <= P[0] && P[0] < B[1][0] && B[0][1] <= P[1] && P[1] < B[1][1]
+	}
+
+	// TODO: Move, because it's too ambiguous to be a general util
+	export function* integerPoints(B: Box2): Iterable<Vec2> {
+		const [[x0, y0], [x1, y1]] = B
+		const P = Vec2.zero()
+		for (let x = Math.floor(x0); x <= x1; ++x) {
+			for (let y = Math.floor(y0); y <= y1; ++y) {
+				P[0] = x
+				P[1] = y
+				yield P
+			}
+		}
+	}
+
+	export function str(B: Box2): string {
+		return `[${B[0][0]} ${B[1][0]}]×[${B[0][1]} ${B[1][1]}]`
 	}
 }
 
