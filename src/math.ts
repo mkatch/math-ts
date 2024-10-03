@@ -60,6 +60,22 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function abs(u: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = Math.abs(u[0])
+		_[1] = Math.abs(u[1])
+		return _
+	}
+
+	export function absSelf(u: Vec2): Vec2 {
+		return abs(u, u)
+	}
+
+	export function sq(u: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] * u[0]
+		_[1] = u[1] * u[1]
+		return _
+	}
+
 	export function add(u: Vec2, v: Vec2): void {
 		u[0] += v[0]
 		u[1] += v[1]
@@ -79,6 +95,12 @@ export namespace Vec2 {
 	export function diff(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = u[0] - v[0]
 		_[1] = u[1] - v[1]
+		return _
+	}
+
+	export function mul(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] * v[0]
+		_[1] = u[1] * v[1]
 		return _
 	}
 	
@@ -141,6 +163,13 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function rper(u: Vec2, _ = uninitialized()): Vec2 {
+		const x = u[0]
+		_[0] = u[1]
+		_[1] = -x
+		return _
+	}
+
 	export function floor(u: Vec2, _ = uninitialized()): IVec2 {
 		_[0] = Math.floor(u[0])
 		_[1] = Math.floor(u[1])
@@ -167,6 +196,20 @@ export namespace Vec2 {
 		const dx = P[0] - Q[0]
 		const dy = P[1] - Q[1]
 		return dx * dx + dy * dy
+	}
+
+	export function normalizeSelf(u: Vec2): Vec2 {
+		const l = Math.hypot(u[0], u[1])
+		u[0] /= l
+		u[1] /= l
+		return u
+	}
+
+	export function normalize(u: Vec2, _ = uninitialized()): Vec2 {
+		const l = Math.hypot(u[0], u[1])
+		_[0] = u[0] / l
+		_[1] = u[1] / l
+		return _
 	}
 
 	export function withLen(u: Vec2, l: number, _ = uninitialized()): Vec2 {
@@ -296,6 +339,33 @@ export namespace Mat2A {
 		const x = P[0], y = P[1]
 		_[0] = M[0] * x + M[1] * y + M[2]
 		_[1] = M[3] * x + M[4] * y + M[5]
+		return _
+	}
+}
+
+export type Coords2Shape = [
+	ox: number, oy: number,
+	uxx: number, uxy: number,
+	uyx: number, uyy: number,
+]
+export type Coords2 = Coords2Shape & { readonly "": unique symbol }
+
+export namespace Coords2 {
+	export function uninitialized(): Coords2 {
+		return new Array<number>(6) as Coords2
+	}
+
+	export function rightFromOriginUnitX(origin: Vec2, unitX: Vec2, _ = uninitialized()): Coords2 {
+		_[0] = origin[0], _[1] = origin[1]
+		_[2] = unitX[0], _[3] = unitX[1]
+		_[4] = -unitX[1], _[5] = unitX[0]
+		return _
+	}
+
+	export function toLocalPoint(C: Coords2, P: Vec2, _ = Vec2.uninitialized()): Vec2 {
+		const dx = P[0] - C[0], dy = P[1] - C[1]
+		_[0] = dx * C[2] + dy * C[3]
+		_[1] = dx * C[4] + dy * C[5]
 		return _
 	}
 }
