@@ -76,23 +76,23 @@ export namespace Vec2 {
 		return _
 	}
 
-	export function add(u: Vec2, v: Vec2): void {
+	export function addSelf(u: Vec2, v: Vec2): void {
 		u[0] += v[0]
 		u[1] += v[1]
 	}
 
-	export function sum(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+	export function add(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = u[0] + v[0]
 		_[1] = u[1] + v[1]
 		return _
 	}
 
-	export function sub(u: Vec2, v: Vec2): void {
+	export function subSelf(u: Vec2, v: Vec2): void {
 		u[0] -= v[0]
 		u[1] -= v[1]
 	}
 
-	export function diff(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+	export function sub(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = u[0] - v[0]
 		_[1] = u[1] - v[1]
 		return _
@@ -103,31 +103,19 @@ export namespace Vec2 {
 		_[1] = u[1] * v[1]
 		return _
 	}
-	
-	export function scale(u: Vec2, s: number): void {
+
+	export function scaleSelf(u: Vec2, s: number): void {
 		u[0] *= s
 		u[1] *= s
 	}
 
-	export function translated(P: Vec2, u: Vec2, _ = uninitialized()): Vec2 {
-		_[0] = P[0] + u[0]
-		_[1] = P[1] + u[1]
-		return _
-	}
-
-	export function scaled(u: Vec2, s: number, _ = uninitialized()): Vec2 {
+	export function scale(u: Vec2, s: number, _ = uninitialized()): Vec2 {
 		_[0] = u[0] * s
 		_[1] = u[1] * s
 		return _
 	}
 
-	export function divided(u: Vec2, s: number, _ = uninitialized()): Vec2 {
-		_[0] = u[0] / s
-		_[1] = u[1] / s
-		return _
-	}
-
-	export function addScaled(u: Vec2, s: number, v: Vec2): void {
+	export function addScaledSelf(u: Vec2, s: number, v: Vec2): void {
 		u[0] += s * v[0]
 		u[1] += s * v[1]
 	}
@@ -170,10 +158,10 @@ export namespace Vec2 {
 		return _
 	}
 
-	export function floor(u: Vec2, _ = uninitialized()): IVec2 {
+	export function floor(u: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = Math.floor(u[0])
 		_[1] = Math.floor(u[1])
-		return _ as IVec2
+		return _ as Vec2
 	}
 
 	export function dot(u: Vec2, v: Vec2): number {
@@ -222,7 +210,7 @@ export namespace Vec2 {
 	export function lengthLimited(u: Vec2, maxLength: number, _ = uninitialized()): Vec2 {
 		// TODO: check if maxLength is positive
 		const l = Math.hypot(u[0], u[1])
-		return l > maxLength ? scaled(u, maxLength / l, _) : copy(u, _)
+		return l > maxLength ? scale(u, maxLength / l, _) : copy(u, _)
 	}
 
 	export function lerp(u: Vec2, v: Vec2, t: number, _ = uninitialized()): Vec2 {
@@ -265,14 +253,14 @@ export namespace Vec3 {
 		return Vec3(s, s, s)
 	}
 
-	export function translated(P: Vec3, u: Vec3, _ = Vec3.zero()): Vec3 {
+	export function add(P: Vec3, u: Vec3, _ = Vec3.zero()): Vec3 {
 		_[0] = P[0] + u[0]
 		_[1] = P[1] + u[1]
 		_[2] = P[2] + u[2]
 		return _
 	}
 
-	export function scaled(u: Vec3, s: number, _ = Vec3.zero()): Vec3 {
+	export function scale(u: Vec3, s: number, _ = Vec3.zero()): Vec3 {
 		_[0] = u[0] * s
 		_[1] = u[1] * s
 		_[2] = u[2] * s
@@ -371,7 +359,12 @@ export namespace Coords2 {
 }
 
 /** Undecorated shape of {@link MatA}. */
-export type MatAShape = [number, number, number, number, number, number, number, number, number, number, number, number, 0, 0, 0, 1]
+export type MatAShape = [
+	number, number, number, number,
+	number, number, number, number,
+	number, number, number, number,
+	0, 0, 0, 1,
+]
 
 /**
  * Affine transformation matrix.
@@ -386,9 +379,11 @@ export function MatA(data: MatAShape): MatA {
 
 export namespace MatA {
 	/**
-	 * Create or modify an affine transofrmation {@link MatA} with a chainable API.
+	 * Create or modify an affine transformation {@link MatA} with a chainable
+	 * API.
 	 *
-	 * @param A Initial matrix, defaults to a new identity matrix. The subsequent operations will be applied to this matrix in place.
+	 * @param A Initial matrix, defaults to a new identity matrix. The subsequent
+	 *  operations will be applied to this matrix in place.
 	 */
 	export function compose(A: MatA = eye()): MatAComposer {
 		return new MatAComposer(A)
@@ -396,79 +391,56 @@ export namespace MatA {
 
 	/** Creates a new identity affine transformation {@link MatA}. */
 	export function eye(): MatA {
-		return MatA([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1])
+		return MatA([
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 1, 0,
+			0, 0, 0, 1,
+		])
 	}
 
 	/** Pre-applies a translation by vector.  */
-	export function translate(A: MatA, u: Vec3): MatA {
+	export function translateSelf(A: MatA, u: Vec3): void {
 		A[3] += u[0]
 		A[7] += u[1]
 		A[11] += u[2]
-		return A
 	}
 
 	/** Creates a new transformation that represents translation by vector. */
 	export function translation(u: Vec3): MatA {
-		return translate(eye(), u)
+		const A = eye()
+		translateSelf(A, u)
+		return A
 	}
 
 	/** Multiplies the first row by a scalar. */
-	export function scaleX(A: MatA, s: number): void {
-		A[0] *= s
-		A[1] *= s
-		A[2] *= s
-		A[3] *= s
+	export function scaleXSelf(A: MatA, s: number): void {
+		A[0] *= s; A[1] *= s; A[2] *= s; A[3] *= s
 	}
 
 	/** Multiplies the second row by a scalar. */
-	export function scaleY(A: MatA, s: number): void {
-		A[4] *= s
-		A[5] *= s
-		A[6] *= s
-		A[7] *= s
+	export function scaleYSelf(A: MatA, s: number): void {
+		A[4] *= s; A[5] *= s; A[6] *= s; A[7] *= s
 	}
 
 	/** Multiplies the second row by a scalar. */
-	export function scaleZ(A: MatA, s: number): void {
-		A[8] *= s
-		A[9] *= s
-		A[10] *= s
-		A[11] *= s
+	export function scaleZSelf(A: MatA, s: number): void {
+		A[8] *= s; A[9] *= s; A[10] *= s; A[11] *= s
 	}
 
 	/** Multiplies the entire matrix by a scalar. */
-	export function scale(A: MatA, s: number): void {
-		A[0] *= s
-		A[1] *= s
-		A[2] *= s
-		A[3] *= s
-		A[4] *= s
-		A[5] *= s
-		A[6] *= s
-		A[7] *= s
-		A[8] *= s
-		A[9] *= s
-		A[10] *= s
-		A[11] *= s
+	export function scaleSelf(A: MatA, s: number): void {
+		A[0] *= s; A[1] *= s; A[ 2] *= s; A[ 3] *= s
+		A[4] *= s; A[5] *= s; A[ 6] *= s; A[ 7] *= s
+		A[8] *= s; A[9] *= s; A[10] *= s; A[11] *= s
 	}
 
 	/** Multiplies each row by the respective vector component scalars. */
-	export function scaleVector(A: MatA, u: Vec3): void {
-		const sx = u[0],
-			sy = u[1],
-			sz = u[2]
-		A[0] *= sx
-		A[1] *= sx
-		A[2] *= sx
-		A[3] *= sx
-		A[4] *= sy
-		A[5] *= sy
-		A[6] *= sy
-		A[7] *= sy
-		A[8] *= sz
-		A[9] *= sz
-		A[10] *= sz
-		A[11] *= sz
+	export function scaleVectorSelf(A: MatA, u: Vec3): void {
+		const sx = u[0], sy = u[1], sz = u[2]
+		A[0] *= sx; A[1] *= sx; A[ 2] *= sx; A[ 3] *= sx
+		A[4] *= sy; A[5] *= sy; A[ 6] *= sy; A[ 7] *= sy
+		A[8] *= sz; A[9] *= sz; A[10] *= sz; A[11] *= sz
 	}
 
 	/**
@@ -478,25 +450,12 @@ export namespace MatA {
 	 *
 	 * @param angle Angle in radians.
 	 **/
-	export function rotateX(A: MatA, angle: number): void {
-		const c = Math.cos(angle),
-			s = Math.sin(angle)
-		const a00 = A[4],
-			a01 = A[5],
-			a02 = A[6],
-			a03 = A[7]
-		const a10 = A[8],
-			a11 = A[9],
-			a12 = A[10],
-			a13 = A[11]
-		A[4] = c * a00 - s * a10
-		A[5] = c * a01 - s * a11
-		A[6] = c * a02 - s * a12
-		A[7] = c * a03 - s * a13
-		A[8] = c * a10 + s * a00
-		A[9] = c * a11 + s * a01
-		A[10] = c * a12 + s * a02
-		A[11] = c * a13 + s * a03
+	export function rotateXSelf(A: MatA, angle: number): void {
+		const c = Math.cos(angle), s = Math.sin(angle)
+		const a00 = A[4], a01 = A[5], a02 = A[ 6], a03 = A[ 7]
+		const a10 = A[8], a11 = A[9], a12 = A[10], a13 = A[11]
+		A[4] = c * a00 - s * a10; A[5] = c * a01 - s * a11; A[ 6] = c * a02 - s * a12; A[ 7] = c * a03 - s * a13
+		A[8] = c * a10 + s * a00; A[9] = c * a11 + s * a01; A[10] = c * a12 + s * a02; A[11] = c * a13 + s * a03
 	}
 
 	/**
@@ -506,25 +465,12 @@ export namespace MatA {
 	 *
 	 * @param angle Angle in radians.
 	 **/
-	export function rotateY(A: MatA, angle: number): void {
-		const c = Math.cos(angle),
-			s = Math.sin(angle)
-		const a00 = A[8],
-			a01 = A[9],
-			a02 = A[10],
-			a03 = A[11]
-		const a10 = A[0],
-			a11 = A[1],
-			a12 = A[2],
-			a13 = A[3]
-		A[8] = c * a00 - s * a10
-		A[9] = c * a01 - s * a11
-		A[10] = c * a02 - s * a12
-		A[11] = c * a03 - s * a13
-		A[0] = c * a10 + s * a00
-		A[1] = c * a11 + s * a01
-		A[2] = c * a12 + s * a02
-		A[3] = c * a13 + s * a03
+	export function rotateYSelf(A: MatA, angle: number): void {
+		const c = Math.cos(angle), s = Math.sin(angle)
+		const a00 = A[8], a01 = A[9], a02 = A[10], a03 = A[11]
+		const a10 = A[0], a11 = A[1], a12 = A[ 2], a13 = A[ 3]
+		A[8] = c * a00 - s * a10; A[9] = c * a01 - s * a11; A[10] = c * a02 - s * a12; A[11] = c * a03 - s * a13
+		A[0] = c * a10 + s * a00; A[1] = c * a11 + s * a01; A[ 2] = c * a12 + s * a02; A[ 3] = c * a13 + s * a03
 	}
 
 	/**
@@ -534,25 +480,12 @@ export namespace MatA {
 	 *
 	 * @param angle Angle in radians.
 	 **/
-	export function rotateZ(A: MatA, angle: number): void {
-		const c = Math.cos(angle),
-			s = Math.sin(angle)
-		const a00 = A[0],
-			a01 = A[1],
-			a02 = A[2],
-			a03 = A[3]
-		const a10 = A[4],
-			a11 = A[5],
-			a12 = A[6],
-			a13 = A[7]
-		A[0] = c * a00 - s * a10
-		A[1] = c * a01 - s * a11
-		A[2] = c * a02 - s * a12
-		A[3] = c * a03 - s * a13
-		A[4] = c * a10 + s * a00
-		A[5] = c * a11 + s * a01
-		A[6] = c * a12 + s * a02
-		A[7] = c * a13 + s * a03
+	export function rotateZSelf(A: MatA, angle: number): void {
+		const c = Math.cos(angle), s = Math.sin(angle)
+		const a00 = A[0], a01 = A[1], a02 = A[2], a03 = A[3]
+		const a10 = A[4], a11 = A[5], a12 = A[6], a13 = A[7]
+		A[0] = c * a00 - s * a10; A[1] = c * a01 - s * a11; A[2] = c * a02 - s * a12; A[3] = c * a03 - s * a13
+		A[4] = c * a10 + s * a00; A[5] = c * a11 + s * a01; A[6] = c * a12 + s * a02; A[7] = c * a13 + s * a03
 	}
 }
 
@@ -563,55 +496,33 @@ export class MatAComposer {
 	get(): MatA {
 		return this.A
 	}
-	/** See {@link MatA.translate}. */
-	translate(u: Vec3): this {
-		MatA.translate(this.A, u)
-		return this
-	}
-	/** See {@link MatA.scaleX}. */
-	scaleX(s: number): this {
-		MatA.scaleX(this.A, s)
-		return this
-	}
-	/** See {@link MatA.scaleY}. */
-	scaleY(s: number): this {
-		MatA.scaleY(this.A, s)
-		return this
-	}
-	/** See {@link MatA.scaleZ}. */
-	scaleZ(s: number): this {
-		MatA.scaleZ(this.A, s)
-		return this
-	}
-	/** See {@link MatA.scale}. */
-	scale(s: number): this {
-		MatA.scale(this.A, s)
-		return this
-	}
-	/** See {@link MatA.scaleVector}. */
-	scaleVector(u: Vec3): this {
-		MatA.scaleVector(this.A, u)
-		return this
-	}
-	/** See {@link MatA.rotateX}. */
-	rotateX(angle: number): this {
-		MatA.rotateX(this.A, angle)
-		return this
-	}
-	/** See {@link MatA.rotateY}. */
-	rotateY(angle: number): this {
-		MatA.rotateY(this.A, angle)
-		return this
-	}
-	/** See {@link MatA.rotateZ}. */
-	rotateZ(angle: number): this {
-		MatA.rotateZ(this.A, angle)
-		return this
-	}
+	/** See {@link MatA.translateSelf}. */
+	translate(u: Vec3): this { MatA.translateSelf(this.A, u); return this }
+	/** See {@link MatA.scaleXSelf}. */
+	scaleX(s: number): this { MatA.scaleXSelf(this.A, s); return this }
+	/** See {@link MatA.scaleYSelf}. */
+	scaleY(s: number): this { MatA.scaleYSelf(this.A, s); return this }
+	/** See {@link MatA.scaleZSelf}. */
+	scaleZ(s: number): this { MatA.scaleZSelf(this.A, s); return this }
+	/** See {@link MatA.scaleSelf}. */
+	scale(s: number): this { MatA.scaleSelf(this.A, s); return this }
+	/** See {@link MatA.scaleVectorSelf}. */
+	scaleVector(u: Vec3): this { MatA.scaleVectorSelf(this.A, u); return this }
+	/** See {@link MatA.rotateXSelf}. */
+	rotateX(angle: number): this { MatA.rotateXSelf(this.A, angle); return this }
+	/** See {@link MatA.rotateYSelf}. */
+	rotateY(angle: number): this { MatA.rotateYSelf(this.A, angle); return this }
+	/** See {@link MatA.rotateZSelf}. */
+	rotateZ(angle: number): this { MatA.rotateZSelf(this.A, angle); return this }
 }
 
 /** Undecorated shape of {@link Mat4} */
-export type Mat4Shape = [a00: number, a01: number, a02: number, a03: number, a10: number, a11: number, a12: number, a13: number, a20: number, a21: number, a22: number, a23: number, a30: number, a31: number, a32: number, a33: number]
+export type Mat4Shape = [
+	a00: number, a01: number, a02: number, a03: number,
+	a10: number, a11: number, a12: number, a13: number,
+	a20: number, a21: number, a22: number, a23: number,
+	a30: number, a31: number, a32: number, a33: number
+]
 
 /**
  * 4x4 matrix.
@@ -638,7 +549,7 @@ export namespace Mat4 {
 		width: number
 		height: number
 		near: number
-		far: number //
+		far: number
 	}): Mat4 {
 		const { fovy, width, height, near, far } = params
 
@@ -646,7 +557,12 @@ export namespace Mat4 {
 		const c0 = near / Math.tan(0.5 * fovy * DEG_TO_RAD)
 		const c1 = (c0 * height) / width
 
-		return Mat4([c1, 0, 0, 0, 0, c0, 0, 0, 0, 0, -(near + far) / depth, (-2 * near * far) / depth, 0, 0, -1, 0])
+		return Mat4([
+			c1,  0,                     0,                         0,
+			 0, c0,                     0,                         0,
+			 0,  0, -(near + far) / depth, (-2 * near * far) / depth,
+			 0,  0,                    -1,                         0,
+		])
 	}
 
 	export function fromDOMMatrix(m: DOMMatrix): Mat4 {
@@ -662,8 +578,8 @@ export namespace Mat4 {
 		const x = P[0], y = P[1], z = P[2]
 		const w = M[12] * x + M[13] * y + M[14] * z + M[15]
 		return Vec3(
-			(M[0] * x + M[1] * y + M[2] * z + M[3]) / w,
-			(M[4] * x + M[5] * y + M[6] * z + M[7]) / w,
+			(M[0] * x + M[1] * y + M[ 2] * z + M[ 3]) / w,
+			(M[4] * x + M[5] * y + M[ 6] * z + M[ 7]) / w,
 			(M[8] * x + M[9] * y + M[10] * z + M[11]) / w,
 		)
 	}
@@ -721,8 +637,8 @@ export namespace Box2 {
 	}
 
 	export function scale(B: Box2, s: number): void {
-		Vec2.scaled(B[0], s, B[0])
-		Vec2.scaled(B[1], s, B[1])
+		Vec2.scale(B[0], s, B[0])
+		Vec2.scale(B[1], s, B[1])
 	}
 
 	export function floor(B: Box2): void {
