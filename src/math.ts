@@ -667,6 +667,12 @@ export namespace Box2 {
 		return _
 	}
 
+	export function fromCornerSize(P: Vec2, s: Vec2, _ = uninitialized()): Box2 {
+		Vec2.copy(P, _[0])
+		Vec2.add(P, s, _[1])
+		return _
+	}
+
 	export function span(B: Box2, _ = Vec2.zero()): Vec2 {
 		return Vec2.span(B[0], B[1], _)
 	}
