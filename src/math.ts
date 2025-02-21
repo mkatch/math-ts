@@ -312,14 +312,14 @@ export namespace Mat2A {
 	}
 
 	export function eye(_ = uninitialized()): Mat2A {
-		_[0] = 1, _[1] = 0, _[2] = 0
-		_[3] = 0, _[4] = 1, _[5] = 0
+		_[0] = 1; _[1] = 0; _[2] = 0
+		_[3] = 0; _[4] = 1; _[5] = 0
 		return _
 	}
 
 	export function fromDOMMatrix(M: DOMMatrix, _ = uninitialized()): Mat2A {
-		_[0] = M.a, _[1] = M.b, _[2] = M.e
-		_[3] = M.c, _[4] = M.d, _[5] = M.f
+		_[0] = M.a; _[1] = M.b; _[2] = M.e
+		_[3] = M.c; _[4] = M.d; _[5] = M.f
 		return _
 	}
 
@@ -344,9 +344,9 @@ export namespace Coords2 {
 	}
 
 	export function rightFromOriginUnitX(origin: Vec2, unitX: Vec2, _ = uninitialized()): Coords2 {
-		_[0] = origin[0], _[1] = origin[1]
-		_[2] = unitX[0], _[3] = unitX[1]
-		_[4] = -unitX[1], _[5] = unitX[0]
+		_[0] = origin[0]; _[1] = origin[1]
+		_[2] = unitX[0]; _[3] = unitX[1]
+		_[4] = -unitX[1]; _[5] = unitX[0]
 		return _
 	}
 
