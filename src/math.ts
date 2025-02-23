@@ -4,6 +4,16 @@ export function sq(x: number): number {
 	return x * x
 }
 
+export function clamp(min: number, val: number, max: number): number {
+	if (val <= min) return min
+	if (val >= max) return max
+	return val
+}
+
+export function roundToZero(x: number): number {
+	return x < 0 ? Math.ceil(x) : Math.floor(x)
+}
+
 export type int = number & { readonly int: unique symbol }
 export function int(n: number): int {
 	if (!Number.isInteger(n)) {
@@ -606,10 +616,6 @@ export namespace Box2 {
 
 	export function center(B: Box2, _ = Vec2.uninitialized()): Vec2 {
 		return Vec2.mid(B[0], B[1], _)
-	}
-
-	export function size(B: Box2, _ = Vec2.uninitialized()): Vec2 {
-		return Vec2.span(B[0], B[1], _)
 	}
 
 	export function expand(B: Box2, P: Vec2): void {
