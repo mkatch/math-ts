@@ -673,8 +673,26 @@ export namespace Box2 {
 		return _
 	}
 
+	export function fromSpanComponents(width: number, height: number, _ = uninitialized()): Box2 {
+		Vec2.zero(_[0])
+		Vec2.set(_[1], width, height)
+		return _
+	}
+
+	export function toCornerSpanComponents(B: Box2): [number, number, number, number] {
+		return [B[0][0], B[0][1], B[1][0] - B[0][0], B[1][1] - B[0][1]]
+	}
+
 	export function span(B: Box2, _ = Vec2.zero()): Vec2 {
 		return Vec2.span(B[0], B[1], _)
+	}
+
+	export function spanX(B: Box2): number {
+		return B[1][0] - B[0][0]
+	}
+
+	export function spanY(B: Box2): number {
+		return B[1][1] - B[0][1]
 	}
 
 	export function containsInEx(B: Box2, P: Vec2): boolean {
