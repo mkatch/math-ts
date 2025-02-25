@@ -46,6 +46,12 @@ export namespace Vec2 {
 		return v[0] === 0 && v[1] === 0
 	}
 
+	export function scalar(s: number, _ = uninitialized()): Vec2 {
+		_[0] = s
+		_[1] = s
+		return _
+	}
+
 	export function polar(r: number, angle: number, _ = uninitialized()): Vec2 {
 		_[0] = r * Math.cos(angle)
 		_[1] = r * Math.sin(angle)
@@ -114,6 +120,17 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function div(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] / v[0]
+		_[1] = u[1] / v[1]
+		return _
+	}
+
+	export function divSelf(u: Vec2, v: Vec2): void {
+		u[0] /= v[0]
+		u[1] /= v[1]
+	}
+
 	export function scaleSelf(u: Vec2, s: number): void {
 		u[0] *= s
 		u[1] *= s
@@ -128,6 +145,22 @@ export namespace Vec2 {
 	export function addScaledSelf(u: Vec2, s: number, v: Vec2): void {
 		u[0] += s * v[0]
 		u[1] += s * v[1]
+	}
+
+	export function neg(u: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = -u[0]
+		_[1] = -u[1]
+		return _
+	}
+
+	export function roundSelf(u: Vec2): void {
+		u[0] = Math.round(u[0])
+		u[1] = Math.round(u[1])
+	}
+
+	export function ceilSelf(u: Vec2): void {
+		u[0] = Math.ceil(u[0])
+		u[1] = Math.ceil(u[1])
 	}
 
 	export function span(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
@@ -146,6 +179,11 @@ export namespace Vec2 {
 		_[0] = Math.max(u[0], v[0])
 		_[1] = Math.max(u[1], v[1])
 		return _
+	}
+
+	export function maxScalarSelf(u: Vec2, s: number): void {
+		u[0] = Math.max(u[0], s)
+		u[1] = Math.max(u[1], s)
 	}
 
 	export function mid(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
@@ -317,6 +355,17 @@ export function Mat2A(data: Mat2AShape): Mat2A {
 }
 
 export namespace Mat2A {
+	/**
+	 * Create or modify an affine transformation {@link Mat2A} with a chainable
+	 * API.
+	 *
+	 * @param A Initial matrix, defaults to a new identity matrix. The subsequent
+	 *  operations will be applied to this matrix in place.
+	 */
+		export function compose(A: Mat2A = eye()): Mat2AComposer {
+			return new Mat2AComposer(A)
+		}
+
 	export function uninitialized(): Mat2A {
 		return new Array<number>(6) as Mat2A
 	}
@@ -333,12 +382,83 @@ export namespace Mat2A {
 		return _
 	}
 
+	export function mul(A: Mat2A, B: Mat2A, _ = uninitialized()): Mat2A {
+		const a00 = A[0], a01 = A[1], a02 = A[2]
+		const a10 = A[3], a11 = A[4], a12 = A[5]
+
+		const b00 = B[0], b01 = B[1], b02 = B[2]
+		const b10 = B[3], b11 = B[4], b12 = B[5]
+
+		_[0] = a00 * b00 + a01 * b10, _[1] = a00 * b01 + a01 * b11, _[2] = a00 * b02 + a01 * b12 + a02
+		_[3] = a10 * b00 + a11 * b10, _[4] = a10 * b01 + a11 * b11, _[5] = a10 * b02 + a11 * b12 + a12
+		return _
+	}
+
+	export function fromTranslation(t: Vec2, _ = uninitialized()): Mat2A {
+		_[0] = 1; _[1] = 0; _[2] = t[0]
+		_[3] = 0; _[4] = 1; _[5] = t[1]
+		return _
+	}
+
+	export function fromTranslationComponents(dx: number, dy: number, _ = uninitialized()): Mat2A {
+		_[0] = 1; _[1] = 0; _[2] = dx
+		_[3] = 0; _[4] = 1; _[5] = dy
+		return _
+	}
+
+	export function translateSelf(A: Mat2A, u: Vec2): void {
+		A[2] += u[0]
+		A[5] += u[1]
+	}
+
+	export function setTranslation(A: Mat2A, u: Vec2): void {
+		A[2] = u[0]
+		A[5] = u[1]
+	}
+
+	export function translateComponentsSelf(A: Mat2A, dx: number, dy: number): void {
+		A[2] += dx
+		A[5] += dy
+	}
+
+	export function scaleScalarSelf(A: Mat2A, s: number): void {
+		A[0] *= s; A[1] *= s; A[2] *= s
+		A[3] *= s; A[4] *= s; A[5] *= s
+	}
+
+	export function setDiagonal(A: Mat2A, u: Vec2): void {
+		A[0] = u[0]
+		A[4] = u[1]
+	}
+
+	export function setDiagonalComponents(A: Mat2A, sx: number, sy: number): void {
+		A[0] = sx
+		A[4] = sy
+	}
+
 	export function transformPoint(M: Mat2A, P: Vec2, _ = Vec2.uninitialized()): Vec2 {
 		const x = P[0], y = P[1]
 		_[0] = M[0] * x + M[1] * y + M[2]
 		_[1] = M[3] * x + M[4] * y + M[5]
 		return _
 	}
+}
+
+/** Helper for chaining operations on a {@link Mat2A}. Construct with {@link Mat2A.compose} */
+export class Mat2AComposer {
+	constructor(private readonly A: Mat2A) {}
+	/** Gets the underlying {@link Mat2A}. WARNING: Not a copy! Subsequent operations still affect it. */
+	get(): Mat2A {
+		return this.A
+	}
+	/** See {@link Mat2A.translateSelf}. */
+	translate(u: Vec2): this { Mat2A.translateSelf(this.A, u); return this }
+	/** See {@link Mat2A.translateComponentsSelf}. */
+	translateComponents(dx: number, dy: number): this { Mat2A.translateComponentsSelf(this.A, dx, dy); return this }
+	/** See {@link Mat2A.scaleScalarSelf}. */
+	scaleScalar(s: number): this { Mat2A.scaleScalarSelf(this.A, s); return this }
+	/** See {@link Mat2A.multiply}. */
+	apply(B: Mat2A): this { Mat2A.mul(B, this.A, this.A); return this }
 }
 
 export type Coords2Shape = [
@@ -502,7 +622,7 @@ export namespace MatA {
 /** Helper for chaining operations on a {@link MatA}. Construct with {@link MatA.compose} */
 export class MatAComposer {
 	constructor(private readonly A: MatA) {}
-	/** Gets the underlying {@link MatA}. WARNING: Not a copy! Supsequent operations still affect it. */
+	/** Gets the underlying {@link MatA}. WARNING: Not a copy! Subsequent operations still affect it. */
 	get(): MatA {
 		return this.A
 	}
@@ -670,6 +790,14 @@ export namespace Box2 {
 		const x = P[0], y = P[1]
 		Vec2.set(_[0], x - r, y - r)
 		Vec2.set(_[1], x + r, y + r)
+		return _
+	}
+
+	export function fromCenterSpan(P: Vec2, s: Vec2, _ = uninitialized()): Box2 {
+		const x = P[0], y = P[1]
+		const rx = 0.5 * s[0], ry = 0.5 * s[1]
+		Vec2.set(_[0], x - rx, y - ry)
+		Vec2.set(_[1], x + rx, x + ry)
 		return _
 	}
 
