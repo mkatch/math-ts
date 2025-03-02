@@ -142,6 +142,17 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function divScalarSelf(u: Vec2, s: number): void {
+		u[0] /= s
+		u[1] /= s
+	}
+
+	export function addScaled(u: Vec2, s: number, v: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = u[0] + s * v[0]
+		_[1] = u[1] + s * v[1]
+		return _
+	}
+
 	export function addScaledSelf(u: Vec2, s: number, v: Vec2): void {
 		u[0] += s * v[0]
 		u[1] += s * v[1]
@@ -374,6 +385,15 @@ export namespace Mat2A {
 		_[0] = 1; _[1] = 0; _[2] = 0
 		_[3] = 0; _[4] = 1; _[5] = 0
 		return _
+	}
+
+	export function set(
+		A: Mat2A,
+		a00: number, a01: number, dx: number,
+		a10: number, a11: number, dy: number,
+	): void {
+		A[0] = a00; A[1] = a01; A[2] = dx
+		A[3] = a10; A[4] = a11; A[5] = dy
 	}
 
 	export function fromDOMMatrix(M: DOMMatrix, _ = uninitialized()): Mat2A {
