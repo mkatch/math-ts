@@ -58,6 +58,12 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function inBase(x: number, ux: Vec2, y: number, uy: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = x * ux[0] + y * uy[0]
+		_[1] = x * ux[1] + y * uy[1]
+		return _
+	}
+
 	export function copy(v: Vec2, _: Vec2 = uninitialized()): Vec2 {
 		_[0] = v[0]
 		_[1] = v[1]
@@ -142,6 +148,12 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function divScalar(u: Vec2, s: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0] / s
+		_[1] = u[1] / s
+		return _
+	}
+
 	export function divScalarSelf(u: Vec2, s: number): void {
 		u[0] /= s
 		u[1] /= s
@@ -177,6 +189,12 @@ export namespace Vec2 {
 	export function span(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = Q[0] - P[0]
 		_[1] = Q[1] - P[1]
+		return _
+	}
+
+	export function unitSpan(P: Vec2, Q: Vec2, _ = uninitialized()): Vec2 {
+		Vec2.span(P, Q, _)
+		Vec2.normalizeSelf(_)
 		return _
 	}
 
@@ -270,6 +288,16 @@ export namespace Vec2 {
 		// TODO: check if maxLength is positive
 		const l = Math.hypot(u[0], u[1])
 		return l > maxLength ? scale(u, maxLength / l, _) : copy(u, _)
+	}
+
+	export function clampLengthMaxSelf(u: Vec2, maxLength: number): void {
+		const mm = maxLength ** 2
+		const ll = u[0] ** 2 + u[1] ** 2
+		if (ll > mm) {
+			const s = Math.sqrt(mm / ll)
+			u[0] *= s
+			u[1] *= s
+		}
 	}
 
 	export function lerp(u: Vec2, v: Vec2, t: number, _ = uninitialized()): Vec2 {
