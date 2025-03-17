@@ -10,6 +10,10 @@ export function clamp(min: number, val: number, max: number): number {
 	return val
 }
 
+export function lerp(a: number, b: number, t: number): number {
+	return (1 - t) * a + t * b
+}
+
 export function roundToZero(x: number): number {
 	return x < 0 ? Math.ceil(x) : Math.floor(x)
 }
@@ -46,6 +50,14 @@ export namespace Vec2 {
 		return v[0] === 0 && v[1] === 0
 	}
 
+	export function isFinite(u: Vec2): boolean {
+		return Number.isFinite(u[0]) && Number.isFinite(u[1])
+	}
+
+	export function strictEq(u: Vec2, v: Vec2): boolean {
+		return u[0] === v[0] && u[1] === v[1]
+	}
+
 	export function scalar(s: number, _ = uninitialized()): Vec2 {
 		_[0] = s
 		_[1] = s
@@ -61,6 +73,12 @@ export namespace Vec2 {
 	export function inBase(x: number, ux: Vec2, y: number, uy: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = x * ux[0] + y * uy[0]
 		_[1] = x * ux[1] + y * uy[1]
+		return _
+	}
+
+	export function inRightBase(ux: Vec2, x: number, y: number, _ = uninitialized()): Vec2 {
+		_[0] = x * ux[0] - y * ux[1]
+		_[1] = x * ux[1] + y * ux[0]
 		return _
 	}
 
@@ -235,6 +253,13 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function rperSelf(u: Vec2): Vec2 {
+		const x = u[0]
+		u[0] = u[1]
+		u[1] = -x
+		return u
+	}
+
 	export function floor(u: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = Math.floor(u[0])
 		_[1] = Math.floor(u[1])
@@ -255,6 +280,12 @@ export namespace Vec2 {
 
 	export function lenSq(u: Vec2): number {
 		return u[0] * u[0] + u[1] * u[1]
+	}
+
+	export function dist(P: Vec2, Q: Vec2): number {
+		const dx = P[0] - Q[0]
+		const dy = P[1] - Q[1]
+		return Math.hypot(dx, dy)
 	}
 
 	export function distSq(P: Vec2, Q: Vec2): number {
