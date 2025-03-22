@@ -14,6 +14,11 @@ export function lerp(a: number, b: number, t: number): number {
 	return (1 - t) * a + t * b
 }
 
+export function safeRatio(n: number, d: number): number | undefined {
+	const r = n / d
+	return Number.isFinite(r) ? r : undefined
+}
+
 export function roundToZero(x: number): number {
 	return x < 0 ? Math.ceil(x) : Math.floor(x)
 }
