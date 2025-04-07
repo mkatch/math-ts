@@ -1,4 +1,5 @@
 const DEG_TO_RAD = Math.PI / 180
+export const SQRT2 = Math.sqrt(2)
 
 export function sq(x: number): number {
 	return x * x
@@ -21,6 +22,10 @@ export function safeRatio(n: number, d: number): number | undefined {
 
 export function roundToZero(x: number): number {
 	return x < 0 ? Math.ceil(x) : Math.floor(x)
+}
+
+export function modulo(n: number, d: number): number {
+	return ((n % d) + d) % d
 }
 
 export type int = number & { readonly int: unique symbol }
@@ -87,6 +92,18 @@ export namespace Vec2 {
 		return _
 	}
 
+	export function fromBaseYComponents(uy: Vec2, x: number, y: number, _ = uninitialized()): Vec2 {
+		_[0] = y * uy[0] + x * uy[1]
+		_[1] = y * uy[1] - x * uy[0]
+		return _
+	}
+
+	export function rebaseY(uy: Vec2, u: Vec2, _ = uninitialized()): Vec2 {
+		_[0] = Vec2.per(u, uy)
+		_[1] = Vec2.dot(u, uy)
+		return _
+	}
+
 	export function copy(v: Vec2, _: Vec2 = uninitialized()): Vec2 {
 		_[0] = v[0]
 		_[1] = v[1]
@@ -129,6 +146,30 @@ export namespace Vec2 {
 	export function add(u: Vec2, v: Vec2, _ = uninitialized()): Vec2 {
 		_[0] = u[0] + v[0]
 		_[1] = u[1] + v[1]
+		return _
+	}
+
+	export function addX(u: Vec2, dx: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0] + dx
+		_[1] = u[1]
+		return _
+	}
+
+	export function subX(u: Vec2, dx: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0] - dx
+		_[1] = u[1]
+		return _
+	}
+
+	export function addY(u: Vec2, dy: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0]
+		_[1] = u[1] + dy
+		return _
+	}
+
+	export function subY(u: Vec2, dy: number, _ = uninitialized()): Vec2 {
+		_[0] = u[0]
+		_[1] = u[1] - dy
 		return _
 	}
 
@@ -881,7 +922,7 @@ export namespace Box2 {
 		const x = P[0], y = P[1]
 		const rx = 0.5 * s[0], ry = 0.5 * s[1]
 		Vec2.set(_[0], x - rx, y - ry)
-		Vec2.set(_[1], x + rx, x + ry)
+		Vec2.set(_[1], x + rx, y + ry)
 		return _
 	}
 
@@ -901,8 +942,14 @@ export namespace Box2 {
 		return [B[0][0], B[0][1], B[1][0] - B[0][0], B[1][1] - B[0][1]]
 	}
 
-	export function span(B: Box2, _ = Vec2.zero()): Vec2 {
+	export function span(B: Box2, _ = Vec2.uninitialized()): Vec2 {
 		return Vec2.span(B[0], B[1], _)
+	}
+
+	export function halfSpan(B: Box2, _ = Vec2.uninitialized()): Vec2 {
+		Box2.span(B, _)
+		Vec2.scaleSelf(_, 0.5)
+		return _
 	}
 
 	export function spanX(B: Box2): number {
