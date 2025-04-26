@@ -478,12 +478,16 @@ export namespace Mat2A {
 	 * @param A Initial matrix, defaults to a new identity matrix. The subsequent
 	 *  operations will be applied to this matrix in place.
 	 */
-		export function compose(A: Mat2A = eye()): Mat2AComposer {
-			return new Mat2AComposer(A)
-		}
+	export function compose(A: Mat2A = eye()): Mat2AComposer {
+		return new Mat2AComposer(A)
+	}
 
 	export function uninitialized(): Mat2A {
 		return new Array<number>(6) as Mat2A
+	}
+
+	export function str(A: Mat2A): string {
+		return `[${A[0]} ${A[1]} ${A[2]}; ${A[3]} ${A[4]} ${A[5]}]`
 	}
 
 	export function eye(_ = uninitialized()): Mat2A {
@@ -576,13 +580,15 @@ export class Mat2AComposer {
 	get(): Mat2A {
 		return this.A
 	}
+	/** See {@link Mat2A.eye}. */
+	eye(): this { Mat2A.eye(this.A); return this }
 	/** See {@link Mat2A.translateSelf}. */
 	translate(u: Vec2): this { Mat2A.translateSelf(this.A, u); return this }
 	/** See {@link Mat2A.translateComponentsSelf}. */
 	translateComponents(dx: number, dy: number): this { Mat2A.translateComponentsSelf(this.A, dx, dy); return this }
 	/** See {@link Mat2A.scaleScalarSelf}. */
 	scaleScalar(s: number): this { Mat2A.scaleScalarSelf(this.A, s); return this }
-	/** See {@link Mat2A.multiply}. */
+	/** See {@link Mat2A.mul}. */
 	apply(B: Mat2A): this { Mat2A.mul(B, this.A, this.A); return this }
 }
 
@@ -932,6 +938,12 @@ export namespace Box2 {
 		return _
 	}
 
+	export function fromSpan(span: Vec2, _ = uninitialized()): Box2 {
+		Vec2.zero(_[0])
+		Vec2.copy(span, _[1])
+		return _
+	}
+
 	export function fromSpanComponents(width: number, height: number, _ = uninitialized()): Box2 {
 		Vec2.zero(_[0])
 		Vec2.set(_[1], width, height)
@@ -962,6 +974,14 @@ export namespace Box2 {
 
 	export function containsInEx(B: Box2, P: Vec2): boolean {
 		return B[0][0] <= P[0] && P[0] < B[1][0] && B[0][1] <= P[1] && P[1] < B[1][1]
+	}
+
+	/**
+	 * Whether two boxes are intersecting, assuming both are positively oriented and have exclusive
+	 * bounds.
+	 */
+	export function intersectPosEx(A: Box2, B: Box2): boolean {
+		return A[0][0] < B[1][0] && A[0][1] < B[1][1] && A[1][0] > B[0][0] && A[1][1] > B[0][1] 
 	}
 
 	// TODO: Move, because it's too ambiguous to be a general util
