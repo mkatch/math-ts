@@ -496,6 +496,12 @@ export namespace Mat2A {
 		return _
 	}
 
+	export function copy(A: Mat2A, _ = uninitialized()): Mat2A {
+		_[0] = A[0]; _[1] = A[1]; _[2] = A[2]
+		_[3] = A[3]; _[4] = A[4]; _[5] = A[5]
+		return _
+	}
+
 	export function set(
 		A: Mat2A,
 		a00: number, a01: number, dx: number,
@@ -555,6 +561,11 @@ export namespace Mat2A {
 		A[3] *= s; A[4] *= s; A[5] *= s
 	}
 
+	export function divComponentsSelf(A: Mat2A, dx: number, dy: number): void {
+		A[0] /= dx; A[1] /= dx; A[2] /= dx
+		A[3] /= dy; A[4] /= dy; A[5] /= dy
+	}
+
 	export function setDiagonal(A: Mat2A, u: Vec2): void {
 		A[0] = u[0]
 		A[4] = u[1]
@@ -588,6 +599,8 @@ export class Mat2AComposer {
 	translateComponents(dx: number, dy: number): this { Mat2A.translateComponentsSelf(this.A, dx, dy); return this }
 	/** See {@link Mat2A.scaleScalarSelf}. */
 	scaleScalar(s: number): this { Mat2A.scaleScalarSelf(this.A, s); return this }
+	/** See {@link Mat2A.divComponentsSelf}. */
+	divComponents(dx: number, dy: number): this { Mat2A.divComponentsSelf(this.A, dx, dy); return this }
 	/** See {@link Mat2A.mul}. */
 	apply(B: Mat2A): this { Mat2A.mul(B, this.A, this.A); return this }
 }
