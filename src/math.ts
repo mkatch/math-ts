@@ -67,7 +67,11 @@ export namespace Vec2 {
 	export function strictEq(u: Vec2, v: Vec2): boolean {
 		return u[0] === v[0] && u[1] === v[1]
 	}
-
+	
+	export function strictEqComponents(u: Vec2, x: number, y: number): boolean {
+		return u[0] === x && u[1] === y
+	}
+	
 	export function scalar(s: number, _ = uninitialized()): Vec2 {
 		_[0] = s
 		_[1] = s
