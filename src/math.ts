@@ -565,6 +565,10 @@ export namespace Mat2A {
 		A[3] *= s; A[4] *= s; A[5] *= s
 	}
 
+	export function mirrorXSelf(A: Mat2A): void {
+	A[0] *= -1; A[1] *= -1; A[2] *= -1
+	}
+
 	export function divComponentsSelf(A: Mat2A, dx: number, dy: number): void {
 		A[0] /= dx; A[1] /= dx; A[2] /= dx
 		A[3] /= dy; A[4] /= dy; A[5] /= dy
