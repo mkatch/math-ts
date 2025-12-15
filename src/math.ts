@@ -959,6 +959,12 @@ export namespace Box2 {
 		return _
 	}
 
+	export function fromCornerSpanComponents(x: number, y: number, sx: number, sy: number, _ = uninitialized()): Box2 {
+		Vec2.set(_[0], x, y)
+		Vec2.set(_[1], x + sx, y + sy)
+		return _
+	}
+
 	export function fromSpan(span: Vec2, _ = uninitialized()): Box2 {
 		Vec2.zero(_[0])
 		Vec2.copy(span, _[1])
@@ -995,6 +1001,10 @@ export namespace Box2 {
 
 	export function containsInEx(B: Box2, P: Vec2): boolean {
 		return B[0][0] <= P[0] && P[0] < B[1][0] && B[0][1] <= P[1] && P[1] < B[1][1]
+	}
+
+	export function containsInIn(B: Box2, P: Vec2): boolean {
+		return B[0][0] <= P[0] && P[0] <= B[1][0] && B[0][1] <= P[1] && P[1] <= B[1][1]
 	}
 
 	/**
