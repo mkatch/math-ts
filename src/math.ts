@@ -521,6 +521,10 @@ export namespace Mat2A {
 		return _
 	}
 
+	export function toDOMMatrix(A: Mat2A): DOMMatrix {
+		return new DOMMatrix([A[0], A[1], A[3], A[4], A[2], A[5]])
+	}
+
 	export function mul(A: Mat2A, B: Mat2A, _ = uninitialized()): Mat2A {
 		const a00 = A[0], a01 = A[1], a02 = A[2]
 		const a10 = A[3], a11 = A[4], a12 = A[5]
